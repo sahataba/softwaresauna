@@ -28,6 +28,18 @@ object Challenge extends App {
     Array("" , "" , "+", "-", "-", "-", "D", "-", "-", "+"),
   )
 
+  val map3 = Array(
+    Array("" , "" , "@", "-", "-", "-", "+", "-", "-", "-"),
+    Array("" , "" , "" , "" , "" , "" , "B", "" , "" , "" ),
+    Array("K", "-", "-", "-", "-", "-", "|", "-", "-", "A"),
+    Array("|", "" , "" , "" , "" , "" , "|", "" , "" , "|"),
+    Array("|", "" , "" , "+", "-", "-", "E", "" , "" , "|"),
+    Array("|", "" , "" , "|", "" , "" , "" , "" , "" , "|"),
+    Array("+", "-", "-", "E", "-", "-", "E", "x", "" , "C"),
+    Array("" , "" , "" , "|", "" , "" , "" , "" , "" , "|"),
+    Array("" , "" , "" , "+", "-", "-", "F", "-", "-", "+"),
+  )
+
 
   private def solve(map: Array[Array[String]]): List[(String, Coordinate)] = {
     val initialPositions =
@@ -49,38 +61,32 @@ object Challenge extends App {
     val maxX = map.head.length
 
     while (current._1 != "x") {
+      val visited: Set[Coordinate] = path.map(_._2).toSet
       val possibleNeighbours = current._1 match  {
         case "@" => List(current._2.up, current._2.down, current._2.left, current._2.right)
-        case "-" => if(previous._1 == "|") List(current._2.up, current._2.down) else List(current._2.left, current._2.right)
-        case "|" => List(current._2.up, current._2.down)
-        case "+" => {
-            if(previous._1 == "-") List(current._2.up, current._2.down)
-            else if (previous._1 == "|") List(current._2.left, current._2.right)
-            else if (previous._2.y == current._2.y + 1) List(current._2.left, current._2.right)
-            else if (previous._2.y == current._2.y - 1) List(current._2.left, current._2.right)
-            else if (previous._2.x == current._2.x + 1) List(current._2.up, current._2.down)
-            else if (previous._2.x == current._2.x - 1) List(current._2.up, current._2.down)
-            else Nil //todo
-        }
-        case normal: String => {
-            List(current._2.up, current._2.down, current._2.left, current._2.right)
-        }
+        case "-" => if(visited(current._2)) List(current._2.up, current._2.down) else List(current._2.left, current._2.right)
+        case "|" => if(visited(current._2)) List(current._2.left, current._2.right) else List(current._2.up, current._2.down)
+        case "+" => List(current._2.up, current._2.down, current._2.left, current._2.right)
+        case normal: String => List(current._2.up, current._2.down, current._2.left, current._2.right).filter(!visited(_))
       }
       val next = possibleNeighbours
-        .filter(_.valid(maxX, maxY))
+        .filter(a => a.valid(maxX, maxY))
         .filter(_ != previous._2)
         .find(n => map(n.y)(n.x) != "")
         .get //todo check for multiple
       val entry = (map(next.y)(next.x), next)
-      path = entry :: path
+      path = current :: path
       previous = current
       current = entry
     }
 
+    path = current :: path
     path
   }
 
-  println(solve(map1).reverse.map(_._1))
-  println(solve(map2).reverse.map(_._1))
+  val sol1 = solve(map1).reverse.map(_._1).mkString
+  require( sol1 == "@---A---+|C|+---+|+-B-x")
+  require(solve(map2).reverse.map(_._1).mkString == "@|A+---B--+|+----C|-||+---D--+|x")
+  require(solve(map3).reverse.map(_._1).mkString == "@---+B||E--+|E|+--F--+|C|||A--|-----K|||+--E--Ex")
 
 }

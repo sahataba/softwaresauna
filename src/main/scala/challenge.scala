@@ -41,7 +41,7 @@ object Challenge extends App {
   )
 
 
-  private def solve(map: Array[Array[String]]): List[(String, Coordinate)] = {
+  private def solve(map: Array[Array[String]]): (String, String) = {
     val initialPositions =
       for {
         (row, y)   <- map.zipWithIndex
@@ -56,6 +56,7 @@ object Challenge extends App {
     var previous: (String, Coordinate) = ("", Coordinate(-1, -1))//todo
 
     var path = List[(String, Coordinate)]()
+    var letters = List[String]()
 
     val maxY = map.length
     val maxX = map.head.length
@@ -74,19 +75,27 @@ object Challenge extends App {
         .filter(_ != previous._2)
         .find(n => map(n.y)(n.x) != "")
         .get //todo check for multiple
+
       val entry = (map(next.y)(next.x), next)
       path = current :: path
+      if (!visited(current._2) && Character.isLetter(current._1(0))) {
+        letters = current._1 :: letters
+      }
       previous = current
       current = entry
     }
 
     path = current :: path
-    path
+    (letters.reverse.mkString, path.reverse.map(_._1).mkString)
   }
 
-  val sol1 = solve(map1).reverse.map(_._1).mkString
-  require( sol1 == "@---A---+|C|+---+|+-B-x")
-  require(solve(map2).reverse.map(_._1).mkString == "@|A+---B--+|+----C|-||+---D--+|x")
-  require(solve(map3).reverse.map(_._1).mkString == "@---+B||E--+|E|+--F--+|C|||A--|-----K|||+--E--Ex")
+  val correctSolutions = List(
+    ("ACB", "@---A---+|C|+---+|+-B-x"),
+    ("ABCD", "@|A+---B--+|+----C|-||+---D--+|x"),
+    ("BEEFCAKE", "@---+B||E--+|E|+--F--+|C|||A--|-----K|||+--E--Ex")
+  )
+  val solutions = List(map1, map2, map3).map(solve)
+  println(solutions)
+  require(solutions == correctSolutions)
 
 }

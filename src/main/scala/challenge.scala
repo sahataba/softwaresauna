@@ -36,72 +36,41 @@ object Challenge extends App {
     var path = List[(String, Coordinate)]()
 
     while (current._1 != "x") {
-      current._1 match  {
+      val possibleNeighbours = current._1 match  {
         case "@" => {
-          val possibleNeighbours =
             List(current._2.up, current._2.down, current._2.left, current._2.right)
-              .filter(_.valid).filter(_ != previous._2)
-          println(current)
-          println(possibleNeighbours)
-          val next = possibleNeighbours.find(n => map(n.y)(n.x) != "").get //todo check for multiple
-          val entry = (map(next.y)(next.x), next)
-          path = entry :: path
-          previous = current
-          current = entry
         }
         case "-" => {
-          val possibleNeighbours =
             List(current._2.left, current._2.right)
-              .filter(_.valid).filter(_ != previous._2)
-          println(current)
-          println(possibleNeighbours)
-          val next = possibleNeighbours.find(n => map(n.y)(n.x) != "").get //todo check for multiple
-          val entry = (map(next.y)(next.x), next)
-          path = entry :: path
-          previous = current
-          current = entry
         }
         case "|" => {
-          val possibleNeighbours =
             List(current._2.up, current._2.down)
-              .filter(_.valid).filter(_ != previous._2)
-          val next = possibleNeighbours.find(n => map(n.y)(n.x) != "").get //todo check for multiple
-          val entry = (map(next.y)(next.x), next)
-          path = entry :: path
-          previous = current
-          current = entry
         }
         case "+" => {
-          val possibleNeighbours =
             (if(previous._1 == "-") List(current._2.up, current._2.down)
             else if (previous._1 == "|") List(current._2.left, current._2.right)
-            else List()).filter(_.valid).filter(_ != previous._2)
-
-          val next = possibleNeighbours.find(n => map(n.y)(n.x) != "").get //todo check for multiple
-          val entry = (map(next.y)(next.x), next)
-          path = entry :: path
-          previous = current
-          current = entry
+            else List())
         }
         case normal: String => {
-          val possibleNeighbours =
             (if(previous._1 == "-") List(current._2.left, current._2.right)
             else if (previous._1 == "|") List(current._2.up, current._2.down)
-            else List()).filter(_.valid).filter(_ != previous._2)
-
-          val next = possibleNeighbours.find(n => map(n.y)(n.x) != "").get //todo check for multiple
-          val entry = (map(next.y)(next.x), next)
-          path = entry :: path
-          previous = current
-          current = entry
+            else List())
         }
       }
+      val next = possibleNeighbours
+        .filter(_.valid)
+        .filter(_ != previous._2)
+        .find(n => map(n.y)(n.x) != "")
+        .get //todo check for multiple
+      val entry = (map(next.y)(next.x), next)
+      path = entry :: path
+      previous = current
+      current = entry
     }
 
     path
   }
 
-  //println(Coordinate(0, 0).up)
   println(solve(map1).reverse.map(_._1))
 
 }

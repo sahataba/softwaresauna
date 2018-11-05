@@ -8,6 +8,8 @@ case class Coordinate(x: Int, y:Int) {
   def valid(maxX: Int, maxY: Int): Boolean = this.x >= 0 && this.y >= 0 && this.x < maxX && this.y < maxY
 }
 
+case class Entry(value: Char, pos: Coordinate)
+
 object Challenge extends App {
 
   val map1 = Array(
@@ -47,52 +49,52 @@ object Challenge extends App {
         (row, y)   <- map.zipWithIndex
         (entry, x) <- row.zipWithIndex
         if entry == "@"
-      } yield (entry, Coordinate(x, y))
+      } yield Entry(entry(0), Coordinate(x, y))
 
     require(initialPositions.length == 1)
 
-    var initial = initialPositions.head
+    val initial = initialPositions.head
     var current = initial
-    var previous: (String, Coordinate) = ("", Coordinate(-1, -1))//todo
+    var previous: Entry = Entry(' ', Coordinate(-1, -1))//todo
 
-    var path = List[(String, Coordinate)]()
-    var letters = List[String]()
+    var path = List[Entry]()
+    var letters = List[Char]()
 
     val maxY = map.length
     val maxX = map.head.length
 
-    while (current._1 != "x") {
-      val visited: Set[Coordinate] = path.map(_._2).toSet
-      val possibleNeighbours = current._1 match  {
-        case "@" => List(current._2.up, current._2.down, current._2.left, current._2.right)
-        case "-" => if(visited(current._2)) List(current._2.up, current._2.down) else List(current._2.left, current._2.right)
-        case "|" => if(visited(current._2)) List(current._2.left, current._2.right) else List(current._2.up, current._2.down)
-        case "+" => List(current._2.up, current._2.down, current._2.left, current._2.right)
-        case normal: String => List(current._2.up, current._2.down, current._2.left, current._2.right).filter(!visited(_))
+    while (current.value != 'x') {
+      val visited: Set[Coordinate] = path.map(_.pos).toSet
+      val possibleNeighbours = current.value match  {
+        case '@' => List(current.pos.up, current.pos.down, current.pos.left, current.pos.right)
+        case '-' => if(visited(current.pos)) List(current.pos.up, current.pos.down) else List(current.pos.left, current.pos.right)
+        case '|' => if(visited(current.pos)) List(current.pos.left, current.pos.right) else List(current.pos.up, current.pos.down)
+        case '+' => List(current.pos.up, current.pos.down, current.pos.left, current.pos.right)
+        case normal => List(current.pos.up, current.pos.down, current.pos.left, current.pos.right).filter(!visited(_))
       }
       val next = possibleNeighbours
         .filter(a => a.valid(maxX, maxY))
-        .filter(_ != previous._2)
+        .filter(_ != previous.pos)
         .find(n => map(n.y)(n.x) != "")
         .get //todo check for multiple
 
-      val entry = (map(next.y)(next.x), next)
+      val entry = Entry(map(next.y)(next.x)(0), next)
       path = current :: path
-      if (!visited(current._2) && Character.isLetter(current._1(0))) {
-        letters = current._1 :: letters
+      if (!visited(current.pos) && Character.isLetter(current.value)) {
+        letters = current.value :: letters
       }
       previous = current
       current = entry
     }
 
     path = current :: path
-    (letters.reverse.mkString, path.reverse.map(_._1).mkString)
+    (letters.reverse.mkString, path.reverse.map(_.value).mkString)
   }
 
   val correctSolutions = List(
-    ("ACB", "@---A---+|C|+---+|+-B-x"),
-    ("ABCD", "@|A+---B--+|+----C|-||+---D--+|x"),
-    ("BEEFCAKE", "@---+B||E--+|E|+--F--+|C|||A--|-----K|||+--E--Ex")
+    ("ACB",       "@---A---+|C|+---+|+-B-x"),
+    ("ABCD",      "@|A+---B--+|+----C|-||+---D--+|x"),
+    ("BEEFCAKE",  "@---+B||E--+|E|+--F--+|C|||A--|-----K|||+--E--Ex")
   )
   val solutions = List(map1, map2, map3).map(solve)
   println(solutions)

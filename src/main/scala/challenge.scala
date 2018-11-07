@@ -12,9 +12,13 @@ final case class Coordinate(x: Int, y:Int) {
 }
 
 final case class AsciiMap(map: Array[Array[Char]]) {
-  require(map.length > 0)
-  require(map(0).length > 0)
-  map.foreach(l => require(map(0).length == l.length))
+
+  val maxY = map.length
+  require(maxY > 0)
+  val maxX = map(0).length
+  require(maxX > 0)
+  map.foreach(l => require(maxX == l.length))
+
   def get(coor: Coordinate): Char = map(coor.y)(coor.x)
 }
 
@@ -67,9 +71,6 @@ object Challenge extends App {
     var path = List[Entry]()
     var letters = List[Char]()
 
-    val maxY = map.map.length
-    val maxX = map.map.head.length
-
     while (current.value != 'x') {
       val visited: Set[Coordinate] = path.map(_.pos).toSet
       val possibleNeighbours = current.value match  {
@@ -80,7 +81,7 @@ object Challenge extends App {
         case normal => current.pos.allNeighbours.filter(!visited(_))
       }
       val next = possibleNeighbours
-        .filter(a => a.valid(maxX, maxY))
+        .filter(a => a.valid(map.maxX, map.maxY))
         .filter(_ != previous.pos)
         .find(n => map.get(n) != ' ')
         .get //todo check for multiple

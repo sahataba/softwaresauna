@@ -12,50 +12,47 @@ case class Entry(value: Char, pos: Coordinate)
 
 object Challenge extends App {
 
-  val map1 = Array(
-    Array("@", "-", "-", "-", "A", "-", "-", "-", "+"),
-    Array("" , "" , "" , "" , "" , "" , "" , "" , "|"),
-    Array("x", "-", "B", "-", "+", "" , "" , "" , "C"),
-    Array("" , "" , "" , "" , "|", "" , "" , "" , "|"),
-    Array("" , "" , "" , "" , "+", "-", "-", "-", "+"),
-  )
+  val map1 =
+    """|@---A---+
+       |        |
+       |x-B-+   C
+       |    |   |
+       |    +---+""".stripMargin.split("\n").map(_.toCharArray)
 
-  val map2 = Array(
-    Array("@", "" , "" , "" , "" , "" , "" , "" , "" , "" ),
-    Array("|", "" , "C", "-", "-", "-", "-", "+", "" , "" ),
-    Array("A", "" , "|", "" , "" , "" , "" , "|", "" , "" ),
-    Array("+", "-", "-", "-", "B", "-", "-", "+", "" , "" ),
-    Array("" , "" , "|", "" , "" , "" , "" , "" , "" , "x"),
-    Array("" , "" , "|", "" , "" , "" , "" , "" , "" , "|"),
-    Array("" , "" , "+", "-", "-", "-", "D", "-", "-", "+"),
-  )
+  val map2 =
+    """|@         
+       || C----+  
+       |A |    |  
+       |+---B--+  
+       |  |      x
+       |  |      |
+       |  +---D--+""".stripMargin.split("\n").map(_.toCharArray)
 
-  val map3 = Array(
-    Array("" , "" , "@", "-", "-", "-", "+", "-", "-", "-"),
-    Array("" , "" , "" , "" , "" , "" , "B", "" , "" , "" ),
-    Array("K", "-", "-", "-", "-", "-", "|", "-", "-", "A"),
-    Array("|", "" , "" , "" , "" , "" , "|", "" , "" , "|"),
-    Array("|", "" , "" , "+", "-", "-", "E", "" , "" , "|"),
-    Array("|", "" , "" , "|", "" , "" , "" , "" , "" , "|"),
-    Array("+", "-", "-", "E", "-", "-", "E", "x", "" , "C"),
-    Array("" , "" , "" , "|", "" , "" , "" , "" , "" , "|"),
-    Array("" , "" , "" , "+", "-", "-", "F", "-", "-", "+"),
-  )
+  val map3 = 
+   """|  @---+   
+      |      B   
+      |K-----|--A
+      ||     |  |
+      ||  +--E  |
+      ||  |     |
+      |+--E--Ex C
+      |   |     |
+      |   +--F--+""".stripMargin.split("\n").map(_.toCharArray)
 
+  private def solve(map: Array[Array[Char]]): (String, String) = {
 
-  private def solve(map: Array[Array[String]]): (String, String) = {
     val initialPositions =
       for {
         (row, y)   <- map.zipWithIndex
         (entry, x) <- row.zipWithIndex
-        if entry == "@"
-      } yield Entry(entry(0), Coordinate(x, y))
+        if entry == '@'
+      } yield Entry(entry, Coordinate(x, y))
 
     require(initialPositions.length == 1)
 
     val initial = initialPositions.head
     var current = initial
-    var previous: Entry = Entry(' ', Coordinate(-1, -1))//todo
+    var previous: Entry = Entry('Š', Coordinate(-1, -1))//todo
 
     var path = List[Entry]()
     var letters = List[Char]()
@@ -75,10 +72,10 @@ object Challenge extends App {
       val next = possibleNeighbours
         .filter(a => a.valid(maxX, maxY))
         .filter(_ != previous.pos)
-        .find(n => map(n.y)(n.x) != "")
+        .find(n => map(n.y)(n.x) != ' ')
         .get //todo check for multiple
 
-      val entry = Entry(map(next.y)(next.x)(0), next)
+      val entry = Entry(map(next.y)(next.x), next)
       path = current :: path
       if (!visited(current.pos) && Character.isLetter(current.value)) {
         letters = current.value :: letters

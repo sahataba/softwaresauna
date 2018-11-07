@@ -1,40 +1,5 @@
 package challenge
 
-final case class Coordinate(x: Int, y:Int) {
-  lazy val up    = this.copy(y = this.y - 1)
-  lazy val down  = this.copy(y = this.y + 1)
-  lazy val left  = this.copy(x = this.x - 1)
-  lazy val right = this.copy(x = this.x + 1)
-}
-
-final case class AsciiMap(private val map: Array[Array[Char]]) {
-
-  val maxY = map.length
-  require(maxY > 0)
-  val maxX = map(0).length
-  require(maxX > 0)
-  map.foreach(l => require(maxX == l.length))
-
-  def get(coor: Coordinate): Char = map(coor.y)(coor.x)
-
-  val allPositions: List[Coordinate] =
-    (for (
-      y <- 0 to maxY - 1;
-      x <- 0 to maxX - 1) yield Coordinate(x, y)).toList
-
-  def verticalNeighbours(coor: Coordinate): List[Coordinate] =
-    List(coor.up, coor.down).filter(valid)
-
-  def horizontalNeighbours(coor: Coordinate): List[Coordinate] =
-    List(coor.left, coor.right).filter(valid)
-
-  def allNeighbours(coor: Coordinate): List[Coordinate] =
-    verticalNeighbours(coor) ++ horizontalNeighbours(coor)
-
-  private def valid(coor: Coordinate): Boolean =
-    coor.x >= 0 && coor.y >= 0 && coor.x < maxX && coor.y < maxY
-}
-
 final case class Entry(value: Char, pos: Coordinate)
 
 object Challenge extends App {

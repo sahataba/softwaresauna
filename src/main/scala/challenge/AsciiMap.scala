@@ -23,10 +23,10 @@ final case class AsciiMap(private val map: Array[Array[Char]]) {
       x <- 0 to maxX - 1) yield Coordinate(x, y)).toList
 
   def verticalNeighbours(coor: Coordinate): List[Coordinate] =
-    List(coor.up, coor.down).filter(valid)
+    List(coor.up, coor.down).filter(valid).filter(n => get(n) != ' ')
 
   def horizontalNeighbours(coor: Coordinate): List[Coordinate] =
-    List(coor.left, coor.right).filter(valid)
+    List(coor.left, coor.right).filter(valid).filter(n => get(n) != ' ')
 
   def allNeighbours(coor: Coordinate): List[Coordinate] =
     verticalNeighbours(coor) ++ horizontalNeighbours(coor)

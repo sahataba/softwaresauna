@@ -72,9 +72,7 @@ object Challenge extends App {
           case None => map.allNeighbours(current.pos)
         }
 
-      val next = possibleNeighbours
-        .find(n => map.get(n) != ' ')
-        .get //todo check for multiple
+      val next = possibleNeighbours.head //todo check for multiple
 
       val entry = Entry(map.get(next), next)
       path = current :: path

@@ -17,6 +17,11 @@ final case class AsciiMap(private val map: Array[Array[Char]]) {
 
   def get(coor: Coordinate): Char = map(coor.y)(coor.x)
 
+  val allPositions: List[Coordinate] =
+    (for (
+      y <- 0 to maxY - 1;
+      x <- 0 to maxX - 1) yield Coordinate(x, y)).toList
+
   def verticalNeighbours(coor: Coordinate): List[Coordinate] =
     List(coor.up, coor.down).filter(valid)
 
@@ -63,13 +68,8 @@ object Challenge extends App {
 
   private def solve(map: AsciiMap): (String, String) = {
 
-    val allPositions: List[Coordinate] =
-      (for (
-        y <- 0 to map.maxY - 1;
-        x <- 0 to map.maxX - 1) yield Coordinate(x, y)).toList
-
     val initialPositions =
-      allPositions.
+      map.allPositions.
         map(c => Entry(map.get(c), c)).
         filter(_.value == '@')
 

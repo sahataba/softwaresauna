@@ -63,7 +63,6 @@ object Challenge extends App {
         previous match {
           case Some(p) => {
             (current.value match {
-              case '+' => map.allNeighbours(current.pos)
               case '-' => map.next(current.pos)(direction(current.pos, p.pos)).toList
               case '|' => map.next(current.pos)(direction(current.pos, p.pos)).toList
               case _ => map.allNeighbours(current.pos).filter(!visited(_))

@@ -5,10 +5,6 @@ final case class Coordinate(x: Int, y:Int) {
   lazy val down  = this.copy(y = this.y + 1)
   lazy val left  = this.copy(x = this.x - 1)
   lazy val right = this.copy(x = this.x + 1)
-  lazy val verticalNeighbours = List(this.up, this.down)
-  lazy val horizontalNeighbours = List(this.left, this.right)
-  lazy val allNeighbours = verticalNeighbours ++ horizontalNeighbours
-  def valid(maxX: Int, maxY: Int): Boolean = this.x >= 0 && this.y >= 0 && this.x < maxX && this.y < maxY
 }
 
 final case class AsciiMap(map: Array[Array[Char]]) {
@@ -20,6 +16,18 @@ final case class AsciiMap(map: Array[Array[Char]]) {
   map.foreach(l => require(maxX == l.length))
 
   def get(coor: Coordinate): Char = map(coor.y)(coor.x)
+
+  def verticalNeighbours(coor: Coordinate): List[Coordinate] =
+    List(coor.up, coor.down).filter(valid)
+
+  def horizontalNeighbours(coor: Coordinate): List[Coordinate] =
+    List(coor.left, coor.right).filter(valid)
+
+  def allNeighbours(coor: Coordinate): List[Coordinate] =
+    verticalNeighbours(coor) ++ horizontalNeighbours(coor)
+
+  private def valid(coor: Coordinate): Boolean =
+    coor.x >= 0 && coor.y >= 0 && coor.x < maxX && coor.y < maxY
 }
 
 final case class Entry(value: Char, pos: Coordinate)
@@ -74,14 +82,13 @@ object Challenge extends App {
     while (current.value != 'x') {
       val visited: Set[Coordinate] = path.map(_.pos).toSet
       val possibleNeighbours = current.value match  {
-        case '@' => current.pos.allNeighbours
-        case '-' => if(visited(current.pos)) current.pos.verticalNeighbours else current.pos.horizontalNeighbours
-        case '|' => if(visited(current.pos)) current.pos.horizontalNeighbours else current.pos.verticalNeighbours
-        case '+' => current.pos.allNeighbours
-        case normal => current.pos.allNeighbours.filter(!visited(_))
+        case '@' => map.allNeighbours(current.pos)
+        case '-' => if(visited(current.pos)) map.verticalNeighbours(current.pos) else map.horizontalNeighbours(current.pos)
+        case '|' => if(visited(current.pos)) map.horizontalNeighbours(current.pos) else map.verticalNeighbours(current.pos)
+        case '+' => map.allNeighbours(current.pos)
+        case _ => map.allNeighbours(current.pos).filter(!visited(_))
       }
       val next = possibleNeighbours
-        .filter(a => a.valid(map.maxX, map.maxY))
         .filter(_ != previous.pos)
         .find(n => map.get(n) != ' ')
         .get //todo check for multiple

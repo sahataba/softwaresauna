@@ -42,22 +42,44 @@ object Challenge extends App {
 
     val initial = initialPositions.head
     var current = initial
-    var previous: Entry = Entry('Š', Coordinate(-1, -1))//todo
+    var previous: Option[Entry] = None
 
     var path = List[Entry]()
     var letters = List[Char]()
 
+    def direction(c: Coordinate, p: Coordinate): Option[String] = {
+      if (c.x == p.x + 1 && c.y == p.y) return Some("right")
+      if (c.x == p.x - 1 && c.y == p.y) return Some("left")
+      if (c.x == p.x  && c.y == p.y + 1) return Some("down")
+      if (c.x == p.x  && c.y == p.y - 1) return Some("up")
+      return None
+    }
+
     while (current.value != 'x') {
+
       val visited: Set[Coordinate] = path.map(_.pos).toSet
-      val possibleNeighbours = current.value match  {
-        case '@' => map.allNeighbours(current.pos)
-        case '-' => if(visited(current.pos)) map.verticalNeighbours(current.pos) else map.horizontalNeighbours(current.pos)
-        case '|' => if(visited(current.pos)) map.horizontalNeighbours(current.pos) else map.verticalNeighbours(current.pos)
-        case '+' => map.allNeighbours(current.pos)
-        case _ => map.allNeighbours(current.pos).filter(!visited(_))
-      }
-      val next = possibleNeighbours
-        .filter(_ != previous.pos)
+
+      val possibleNeighbours: List[Coordinate] =
+        previous match {
+          case Some(p) => {
+            direction(current.pos, p.pos) match {
+              case Some(dir) => {
+                current.value match {
+                  case '+' => map.allNeighbours(current.pos)
+                  case '-' => map.next(current.pos)(dir).toList
+                  case '|' => map.next(current.pos)(dir).toList
+                  case _ => map.allNeighbours(current.pos).filter(!visited(_))
+                }
+              }
+              case None => map.allNeighbours(current.pos)
+            }
+          }
+          case None => map.allNeighbours(current.pos)
+        }
+
+      val withoutPrevious = possibleNeighbours.filter(_ != previous.map(_.pos).getOrElse(Entry(' ', Coordinate(-1, -1))))
+
+      val next = withoutPrevious
         .find(n => map.get(n) != ' ')
         .get //todo check for multiple
 
@@ -66,7 +88,7 @@ object Challenge extends App {
       if (!visited(current.pos) && Character.isLetter(current.value)) {
         letters = current.value :: letters
       }
-      previous = current
+      previous = Some(current)
       current = entry
     }
 

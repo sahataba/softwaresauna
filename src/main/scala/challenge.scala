@@ -11,6 +11,13 @@ final case class Coordinate(x: Int, y:Int) {
   def valid(maxX: Int, maxY: Int): Boolean = this.x >= 0 && this.y >= 0 && this.x < maxX && this.y < maxY
 }
 
+final case class AsciiMap(map: Array[Array[Char]]) {
+  require(map.length > 0)
+  require(map(0).length > 0)
+  map.foreach(l => require(map(0).length == l.length))
+  def get(coor: Coordinate): Char = map(coor.y)(coor.x)
+}
+
 final case class Entry(value: Char, pos: Coordinate)
 
 object Challenge extends App {
@@ -42,11 +49,11 @@ object Challenge extends App {
       |   |     |
       |   +--F--+""".stripMargin.split("\n").map(_.toCharArray)
 
-  private def solve(map: Array[Array[Char]]): (String, String) = {
+  private def solve(map: AsciiMap): (String, String) = {
 
     val initialPositions =
       for {
-        (row, y)   <- map.zipWithIndex
+        (row, y)   <- map.map.zipWithIndex
         (entry, x) <- row.zipWithIndex
         if entry == '@'
       } yield Entry(entry, Coordinate(x, y))
@@ -60,8 +67,8 @@ object Challenge extends App {
     var path = List[Entry]()
     var letters = List[Char]()
 
-    val maxY = map.length
-    val maxX = map.head.length
+    val maxY = map.map.length
+    val maxX = map.map.head.length
 
     while (current.value != 'x') {
       val visited: Set[Coordinate] = path.map(_.pos).toSet
@@ -75,10 +82,10 @@ object Challenge extends App {
       val next = possibleNeighbours
         .filter(a => a.valid(maxX, maxY))
         .filter(_ != previous.pos)
-        .find(n => map(n.y)(n.x) != ' ')
+        .find(n => map.get(n) != ' ')
         .get //todo check for multiple
 
-      val entry = Entry(map(next.y)(next.x), next)
+      val entry = Entry(map.get(next), next)
       path = current :: path
       if (!visited(current.pos) && Character.isLetter(current.value)) {
         letters = current.value :: letters
@@ -96,7 +103,7 @@ object Challenge extends App {
     ("ABCD",      "@|A+---B--+|+----C|-||+---D--+|x"),
     ("BEEFCAKE",  "@---+B||E--+|E|+--F--+|C|||A--|-----K|||+--E--Ex")
   )
-  val solutions = List(map1, map2, map3).map(solve)
+  val solutions = List(map1, map2, map3).map(m => solve(AsciiMap(m)))
   println(solutions)
   require(solutions == correctSolutions)
 

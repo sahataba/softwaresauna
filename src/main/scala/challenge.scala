@@ -7,7 +7,7 @@ final case class Coordinate(x: Int, y:Int) {
   lazy val right = this.copy(x = this.x + 1)
 }
 
-final case class AsciiMap(map: Array[Array[Char]]) {
+final case class AsciiMap(private val map: Array[Array[Char]]) {
 
   val maxY = map.length
   require(maxY > 0)
@@ -63,12 +63,15 @@ object Challenge extends App {
 
   private def solve(map: AsciiMap): (String, String) = {
 
+    val allPositions: List[Coordinate] =
+      (for (
+        y <- 0 to map.maxY - 1;
+        x <- 0 to map.maxX - 1) yield Coordinate(x, y)).toList
+
     val initialPositions =
-      for {
-        (row, y)   <- map.map.zipWithIndex
-        (entry, x) <- row.zipWithIndex
-        if entry == '@'
-      } yield Entry(entry, Coordinate(x, y))
+      allPositions.
+        map(c => Entry(map.get(c), c)).
+        filter(_.value == '@')
 
     require(initialPositions.length == 1)
 

@@ -62,19 +62,17 @@ object Challenge extends App {
       val possibleNeighbours: List[Coordinate] =
         previous match {
           case Some(p) => {
-            current.value match {
+            (current.value match {
               case '+' => map.allNeighbours(current.pos)
               case '-' => map.next(current.pos)(direction(current.pos, p.pos)).toList
               case '|' => map.next(current.pos)(direction(current.pos, p.pos)).toList
               case _ => map.allNeighbours(current.pos).filter(!visited(_))
-            }
+            }).filter(_ != p.pos)
           }
           case None => map.allNeighbours(current.pos)
         }
 
-      val withoutPrevious = possibleNeighbours.filter(_ != previous.map(_.pos).getOrElse(Entry(' ', Coordinate(-1, -1))))
-
-      val next = withoutPrevious
+      val next = possibleNeighbours
         .find(n => map.get(n) != ' ')
         .get //todo check for multiple
 

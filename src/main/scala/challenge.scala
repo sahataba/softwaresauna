@@ -1,14 +1,17 @@
 package challenge
 
-case class Coordinate(x: Int, y:Int) {
-  def up    = this.copy(y = this.y - 1)
-  def down  = this.copy(y = this.y + 1)
-  def left  = this.copy(x = this.x - 1)
-  def right = this.copy(x = this.x + 1)
+final case class Coordinate(x: Int, y:Int) {
+  lazy val up    = this.copy(y = this.y - 1)
+  lazy val down  = this.copy(y = this.y + 1)
+  lazy val left  = this.copy(x = this.x - 1)
+  lazy val right = this.copy(x = this.x + 1)
+  lazy val verticalNeighbours = List(this.up, this.down)
+  lazy val horizontalNeighbours = List(this.left, this.right)
+  lazy val allNeighbours = verticalNeighbours ++ horizontalNeighbours
   def valid(maxX: Int, maxY: Int): Boolean = this.x >= 0 && this.y >= 0 && this.x < maxX && this.y < maxY
 }
 
-case class Entry(value: Char, pos: Coordinate)
+final case class Entry(value: Char, pos: Coordinate)
 
 object Challenge extends App {
 
@@ -63,11 +66,11 @@ object Challenge extends App {
     while (current.value != 'x') {
       val visited: Set[Coordinate] = path.map(_.pos).toSet
       val possibleNeighbours = current.value match  {
-        case '@' => List(current.pos.up, current.pos.down, current.pos.left, current.pos.right)
-        case '-' => if(visited(current.pos)) List(current.pos.up, current.pos.down) else List(current.pos.left, current.pos.right)
-        case '|' => if(visited(current.pos)) List(current.pos.left, current.pos.right) else List(current.pos.up, current.pos.down)
-        case '+' => List(current.pos.up, current.pos.down, current.pos.left, current.pos.right)
-        case normal => List(current.pos.up, current.pos.down, current.pos.left, current.pos.right).filter(!visited(_))
+        case '@' => current.pos.allNeighbours
+        case '-' => if(visited(current.pos)) current.pos.verticalNeighbours else current.pos.horizontalNeighbours
+        case '|' => if(visited(current.pos)) current.pos.horizontalNeighbours else current.pos.verticalNeighbours
+        case '+' => current.pos.allNeighbours
+        case normal => current.pos.allNeighbours.filter(!visited(_))
       }
       val next = possibleNeighbours
         .filter(a => a.valid(maxX, maxY))

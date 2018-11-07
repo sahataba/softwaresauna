@@ -47,12 +47,12 @@ object Challenge extends App {
     var path = List[Entry]()
     var letters = List[Char]()
 
-    def direction(c: Coordinate, p: Coordinate): Option[String] = {
-      if (c.x == p.x + 1 && c.y == p.y) return Some("right")
-      if (c.x == p.x - 1 && c.y == p.y) return Some("left")
-      if (c.x == p.x  && c.y == p.y + 1) return Some("down")
-      if (c.x == p.x  && c.y == p.y - 1) return Some("up")
-      return None
+    def direction(c: Coordinate, p: Coordinate): String = {
+      if (c.x == p.x + 1 && c.y == p.y) return "right"
+      if (c.x == p.x - 1 && c.y == p.y) return "left"
+      if (c.x == p.x  && c.y == p.y + 1) return "down"
+      if (c.x == p.x  && c.y == p.y - 1) return "up"
+      throw new Exception("")
     }
 
     while (current.value != 'x') {
@@ -62,16 +62,11 @@ object Challenge extends App {
       val possibleNeighbours: List[Coordinate] =
         previous match {
           case Some(p) => {
-            direction(current.pos, p.pos) match {
-              case Some(dir) => {
-                current.value match {
-                  case '+' => map.allNeighbours(current.pos)
-                  case '-' => map.next(current.pos)(dir).toList
-                  case '|' => map.next(current.pos)(dir).toList
-                  case _ => map.allNeighbours(current.pos).filter(!visited(_))
-                }
-              }
-              case None => map.allNeighbours(current.pos)
+            current.value match {
+              case '+' => map.allNeighbours(current.pos)
+              case '-' => map.next(current.pos)(direction(current.pos, p.pos)).toList
+              case '|' => map.next(current.pos)(direction(current.pos, p.pos)).toList
+              case _ => map.allNeighbours(current.pos).filter(!visited(_))
             }
           }
           case None => map.allNeighbours(current.pos)

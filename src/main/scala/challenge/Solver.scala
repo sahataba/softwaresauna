@@ -4,29 +4,30 @@ object Solver {
 
   final case class Entry(value: Char, pos: Coordinate)
 
-  def apply(map: AsciiMap): (String, String) = {
+  def direction(c: Coordinate, p: Coordinate): String = {
+    if (c.x == p.x + 1 && c.y == p.y) return "right"
+    if (c.x == p.x - 1 && c.y == p.y) return "left"
+    if (c.x == p.x  && c.y == p.y + 1) return "down"
+    if (c.x == p.x  && c.y == p.y - 1) return "up"
+    throw new Exception("")
+  }
 
+  def initial(map: AsciiMap): Either[String, Entry] = {
     val initialPositions =
-      map.allPositions.
-        map(c => Entry(map.get(c), c)).
-        filter(_.value == '@')
+      map.allPositions.map(c => Entry(map.get(c), c)).filter(_.value == '@')
+    if (initialPositions.length == 1)
+      Right(initialPositions.head)
+    else
+      Left("There is no unique initial position.")
+  }
 
-    require(initialPositions.length == 1)
+  def solve(map: AsciiMap)(initial: Entry): (String, String) = {
 
-    val initial = initialPositions.head
     var current = initial
     var previous: Option[Entry] = None
 
     var path = List[Entry]()
     var letters = List[Char]()
-
-    def direction(c: Coordinate, p: Coordinate): String = {
-      if (c.x == p.x + 1 && c.y == p.y) return "right"
-      if (c.x == p.x - 1 && c.y == p.y) return "left"
-      if (c.x == p.x  && c.y == p.y + 1) return "down"
-      if (c.x == p.x  && c.y == p.y - 1) return "up"
-      throw new Exception("")
-    }
 
     while (current.value != 'x') {
 
@@ -58,5 +59,7 @@ object Solver {
     path = current :: path
     (letters.reverse.mkString, path.reverse.map(_.value).mkString)
   }
+
+  def apply(map: AsciiMap): Either[String, (String, String)] = initial(map).map(solve(map)(_))
 
 }

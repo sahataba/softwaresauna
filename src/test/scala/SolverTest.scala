@@ -75,4 +75,23 @@ class SolverTest extends FunSuite with Matchers {
     error should be ("No available tiles")
   }
 
+  test(
+    "solver should return error for map with multiple initial characters"
+  ) {
+
+    val value =
+      """|  @---+   
+         |      B   
+         |K-----|--A
+         ||     |  |
+         ||  +--E  |
+         ||  |     |
+         |+--E--E- C
+         |   |     |
+         |@  +--F--+"""
+
+    val Left(error) = Solver(value)
+    error should be ("There is no unique initial position.")
+  }
+
 }

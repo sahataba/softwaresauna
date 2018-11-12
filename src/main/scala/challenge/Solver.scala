@@ -39,7 +39,7 @@ object Solver {
             (current.value match {
               case '-' => map.next(current.pos)(direction(current.pos, p.pos)).toList
               case '|' => map.next(current.pos)(direction(current.pos, p.pos)).toList
-              case _ => map.allNeighbours(current.pos).filter(!visited(_))
+              case _ => (map.next(current.pos)(direction(current.pos, p.pos)).toList ++ map.allNeighbours(current.pos)).filter(!visited(_))
             }).filter(_ != p.pos)
           }
           case None => map.allNeighbours(current.pos)

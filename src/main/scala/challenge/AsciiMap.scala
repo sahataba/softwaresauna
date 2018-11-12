@@ -23,10 +23,8 @@ final case class AsciiMap(private val map: Array[Array[Char]]) {
       x <- 0 to maxX - 1) yield Coordinate(x, y)).toList
 
   def allNeighbours(coor: Coordinate): List[Coordinate] =
-    List(coor.up, coor.down, coor.left, coor.right).//todo: bug when changing order
-      filter(valid).
-      filter(n => get(n) != ' ')
+    List(coor.up, coor.down, coor.left, coor.right).filter(valid)
 
   private def valid(coor: Coordinate): Boolean =
-    coor.x >= 0 && coor.y >= 0 && coor.x < maxX && coor.y < maxY
+    coor.x >= 0 && coor.y >= 0 && coor.x < maxX && coor.y < maxY && get(coor) != ' '
 }

@@ -2,6 +2,8 @@ package challenge
 
 object Solver {
 
+  private val pathCharacters: Set[Char] = Set('-', '|')
+
   final case class Entry(value: Char, pos: Coordinate)
 
   def direction(c: Coordinate, p: Coordinate): String = {
@@ -37,8 +39,7 @@ object Solver {
         previous match {
           case Some(p) => {
             (current.value match {
-              case '-' => map.next(current.pos)(direction(current.pos, p.pos)).toList
-              case '|' => map.next(current.pos)(direction(current.pos, p.pos)).toList
+              case chr: Char if pathCharacters(chr) => map.next(current.pos)(direction(current.pos, p.pos)).toList
               case _ => (map.next(current.pos)(direction(current.pos, p.pos)).toList ++ map.allNeighbours(current.pos)).filter(!visited(_))
             }).filter(_ != p.pos)
           }

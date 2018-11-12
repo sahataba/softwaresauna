@@ -62,6 +62,6 @@ object Solver {
     Right(letters.reverse.mkString, path.reverse.map(_.value).mkString)
   }
 
-  def apply(map: AsciiMap): Either[String, (String, String)] = initial(map).flatMap(solve(map)(_))
+  def apply(map: AsciiMap): Either[String, (String, String)] = initial(map).flatMap(solve(map))
 
 }

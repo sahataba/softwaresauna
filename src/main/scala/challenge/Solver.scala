@@ -23,7 +23,7 @@ object Solver {
       Left("There is no unique initial position.")
   }
 
-  def solve(map: AsciiMap)(initial: Entry): Either[String, (String, String)] = {
+  private def solve(map: AsciiMap)(initial: Entry): Either[String, (String, String)] = {
 
     var current = initial
     var previous: Option[Entry] = None

@@ -4,9 +4,9 @@ import scala.util.Try
 final case class AsciiMap(private val map: Array[Array[Char]]) {
 
   val maxY = map.length
-  require(maxY > 0)
+  require(maxY > 0, "y size equals 0")
   val maxX = map(0).length
-  require(maxX > 0)
+  require(maxX > 0, "x size equals 0")
   map.foreach(l => require(maxX == l.length, "different row length"))
 
   def get(coor: Coordinate): Char = map(coor.y)(coor.x)

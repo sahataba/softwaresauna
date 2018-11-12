@@ -26,4 +26,14 @@ class AsciiMapTest extends FunSuite with Matchers {
     val Left(error) = AsciiMap(str)
     error should be ("java.lang.IllegalArgumentException: requirement failed: different row length")
   }
+
+  test(
+    "constructor should return error for empty ascii map"
+  ) {
+
+    val str = "".stripMargin
+
+    val Left(error) = AsciiMap(str)
+    error should be ("java.lang.IllegalArgumentException: requirement failed: x size equals 0")
+  }
 }

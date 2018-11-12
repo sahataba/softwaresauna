@@ -23,7 +23,7 @@ object Solver {
       Left("There is no unique initial position.")
   }
 
-  def solve(map: AsciiMap)(initial: Entry): (String, String) = {
+  def solve(map: AsciiMap)(initial: Entry): Either[String, (String, String)] = {
 
     var current = initial
     var previous: Option[Entry] = None
@@ -46,7 +46,8 @@ object Solver {
           case None => map.allNeighbours(current.pos)
         }
 
-      val next = possibleNeighbours.head //todo check for multiple
+      if (possibleNeighbours.isEmpty) return Left("No available tiles")
+      val next = possibleNeighbours.head
 
       val entry = Entry(map.get(next), next)
       path = current :: path
@@ -58,9 +59,9 @@ object Solver {
     }
 
     path = current :: path
-    (letters.reverse.mkString, path.reverse.map(_.value).mkString)
+    Right(letters.reverse.mkString, path.reverse.map(_.value).mkString)
   }
 
-  def apply(map: AsciiMap): Either[String, (String, String)] = initial(map).map(solve(map)(_))
+  def apply(map: AsciiMap): Either[String, (String, String)] = initial(map).flatMap(solve(map)(_))
 
 }

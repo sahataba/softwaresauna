@@ -7,7 +7,7 @@ final case class AsciiMap(private val map: Array[Array[Char]]) {
   require(maxY > 0)
   val maxX = map(0).length
   require(maxX > 0)
-  map.foreach(l => require(maxX == l.length))
+  map.foreach(l => require(maxX == l.length, "different row length"))
 
   def get(coor: Coordinate): Char = map(coor.y)(coor.x)
 
@@ -35,6 +35,8 @@ object AsciiMap {
   private def toMatrix(value: String): Either[String, Array[Array[Char]]] =
     Try{value.stripMargin.split("\n").map(_.toCharArray)}.toEither.left.map(_.toString)
 
-  def apply(value: String): Either[String, AsciiMap] = toMatrix(value).map(AsciiMap(_))
+  private def create(map: Array[Array[Char]]): Either[String, AsciiMap] = Try{AsciiMap(map)}.toEither.left.map(_.toString)
+
+  def apply(value: String): Either[String, AsciiMap] = toMatrix(value).flatMap(create)
 
 }

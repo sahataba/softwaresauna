@@ -1,17 +1,29 @@
 package challenge
 
-import org.scalatest.FunSuite
+import org.scalatest._
 
-class AsciiMapTest extends FunSuite {
+class AsciiMapTest extends FunSuite with Matchers {
 
   test(
-    "constructor should produce valid AsciiMap of size (2,2) for valid multiline string ascii map"
+    "constructor should return AsciiMap of size (2,2) for valid multiline string ascii map"
   ) {
 
     val str = """| @
                  |d """.stripMargin
+
     val Right(map) = AsciiMap(str)
-    map.maxX === 2
-    map.maxY === 2
+    map.maxX should be (2)
+    map.maxY should be (2)
+  }
+
+  test(
+    "constructor should return error for ascii map of different row sizes"
+  ) {
+
+    val str = """| @
+                 |d tt""".stripMargin
+
+    val Left(error) = AsciiMap(str)
+    error should be ("java.lang.IllegalArgumentException: requirement failed: different row length")
   }
 }

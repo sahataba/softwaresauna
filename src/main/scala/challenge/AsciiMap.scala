@@ -1,4 +1,5 @@
 package challenge
+import scala.util.Try
 
 final case class AsciiMap(private val map: Array[Array[Char]]) {
 
@@ -27,4 +28,13 @@ final case class AsciiMap(private val map: Array[Array[Char]]) {
 
   private def valid(coor: Coordinate): Boolean =
     coor.x >= 0 && coor.y >= 0 && coor.x < maxX && coor.y < maxY && get(coor) != ' '
+}
+
+object AsciiMap {
+
+  private def toMatrix(value: String): Either[String, Array[Array[Char]]] =
+    Try{value.stripMargin.split("\n").map(_.toCharArray)}.toEither.left.map(_.toString)
+
+  def apply(value: String): Either[String, AsciiMap] = toMatrix(value).map(AsciiMap(_))
+
 }

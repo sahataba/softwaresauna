@@ -4,9 +4,9 @@ object Solver {
 
   private val pathCharacters: Set[Char] = Set('-', '|')
 
-  final case class Entry(value: Char, pos: Coordinate)
+  private final case class Entry(value: Char, pos: Coordinate)
 
-  def direction(c: Coordinate, p: Coordinate): String = {
+  private def direction(c: Coordinate, p: Coordinate): String = {
     if (c.x == p.x + 1 && c.y == p.y) return "right"
     if (c.x == p.x - 1 && c.y == p.y) return "left"
     if (c.x == p.x  && c.y == p.y + 1) return "down"
@@ -14,7 +14,7 @@ object Solver {
     throw new Exception("")
   }
 
-  def initial(map: AsciiMap): Either[String, Entry] = {
+  private def initial(map: AsciiMap): Either[String, Entry] = {
     val initialPositions =
       map.allPositions.map(c => Entry(map.get(c), c)).filter(_.value == '@')
     if (initialPositions.length == 1)
@@ -62,6 +62,6 @@ object Solver {
     Right(letters.reverse.mkString, path.reverse.map(_.value).mkString)
   }
 
-  def apply(map: AsciiMap): Either[String, (String, String)] = initial(map).flatMap(solve(map))
+  def apply(value: String): Either[String, (String, String)] = AsciiMap(value).flatMap( map => initial(map).flatMap(solve(map)))
 
 }

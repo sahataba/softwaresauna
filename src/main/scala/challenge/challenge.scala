@@ -40,7 +40,6 @@ object Challenge extends App {
        |   |     |
        |   +--F--+"""
 
-  def toCharMatrix(value: String): Array[Array[Char]] = value.stripMargin.split("\n").map(_.toCharArray)
 
   val correctSolutions = List(
     Right(("ACB",       "@---A---+|C|+---+|+-B-x")),
@@ -48,7 +47,7 @@ object Challenge extends App {
     Right(("BEEFCAKE",  "@---+B||E--+|E|+--F--+|C|||A--|-----K|||+--E--Ex")),
     Left("No available tiles")
   )
-  val solutions = List(map1, map2, map3, map4).map(m => Solver(AsciiMap(toCharMatrix(m))))
+  val solutions = List(map1, map2, map3, map4).map(Solver(_))
   println(solutions)
   require(solutions == correctSolutions)
 
